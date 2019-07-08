@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"module": "commonjs"
+	},
+	"exclude": [
+		"node_modules"
+	],
+	"files": [
+		"index.ts",
+		"models/**/*.ts",
+		"typings/index.d.ts"
+	]
+}
