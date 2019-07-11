@@ -1,6 +1,7 @@
 import { Client } from "discord.js";
-import { UserCommand } from "./models/UserCommand";
+import UserCommand from "./models/UserCommand";
 import { config } from "dotenv";
+import Initializer from "./models/Initializer";
 
 config();
 
@@ -12,8 +13,9 @@ if(!process.env.TOKEN){
 const client = new Client();
 
 UserCommand.register(new UserCommand(/\!initialize/, function(message){
-	message.guild.createChannel("test");
-	message.guild.createRole({name:"test"});
+	message.channel.sendMessage("Received, initializing....");
+	const init = new Initializer(message);
+	init.initialize();
 }));
 
 client.on('ready', () => console.log(`Logged in as ${client.user.tag}`));
