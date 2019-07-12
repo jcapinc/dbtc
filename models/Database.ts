@@ -1,16 +1,30 @@
 import { readFile, writeFile, access, constants } from "fs";
 import { Streak } from "./Streak";
+import { StreakGroup } from "./Initializer";
 
 export class Database {
 	public streaks: Array<Streak>;
+	public profile: Array<StreakGroup>;
 
 	public toString(): string {
-		return JSON.stringify(this);
+		return JSON.stringify({
+			streaks: this.streaks,
+			profile: this.profile.map(s => {
+				return {
+					roleid:  s.roleid,
+					channelid:  s.channelid,
+					channel:  s.channel,
+					role:  s.role,
+					endInterval: s.endInterval
+				};
+			})
+		});
 	}
 
 	public static parse(value:any): Database {
 		const db = new Database()
 		db.streaks = value.streaks ? value.streaks.map(s => Object.assign(new Streak(),s)): [];
+		db.profile = value.profile ? value.profile.map(s => Object.assign(new StreakGroup(""),s)): [];
 		return db;
 	}
 
