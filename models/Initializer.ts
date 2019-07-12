@@ -1,4 +1,4 @@
-import { Message, Role, RoleData, Channel, ChannelData, Guild, PermissionOverwrites, CategoryChannel } from "discord.js";
+import { Message, Role, RoleData, Channel, ChannelData, Guild } from "discord.js";
 
 export default class Initializer {
 	message: Message;
@@ -21,12 +21,15 @@ export default class Initializer {
 
 	constructor(initializationMessage: Message) {
 		this.message = initializationMessage;
+		if(!this.message.member.hasPermission("MANAGE_CHANNELS")){
+			throw new Error("User does not have permission to modify channels");
+		}
 	}
 
 	public async initialize(profile?:Array<StreakGroup>): Promise<Initializer> {
 		if(!profile) profile = await this.generateStreakGroup();
 		this.profile = profile;
-		return await Promise.all(profile.map<Promise<void>>(this.initializeGroup)).then(() => this);
+		return await Promise.all(profile.map<Promise<void>>(g => this.initializeGroup(g))).then(() => this);
 	}
 
 	public async initializeGroup(group:StreakGroup): Promise<void> {
@@ -70,10 +73,12 @@ export class StreakGroup {
 	}
 
 	async initializeChannel(guild:Guild, role: Role): Promise<Channel> {
-		const channel =  await guild.createChannel(this.channel.name,"text")
-		channel.overwritePermissions(guild.defaultRole,{VIEW_CHANNEL: false});
-		channel.overwritePermissions(role,{VIEW_CHANNEL: true});
-		channel.overwritePermissions(guild.owner,{VIEW_CHANNEL:true});
+		this.channel.permissionOverwrites = this.channel.permissionOverwrites || [
+			{id: guild.defaultRole, deny:  "VIEW_CHANNEL" },
+			{id: role,              allow: "VIEW_CHANNEL" },
+			{id: guild.owner,       allow: "VIEW_CHANNEL" }
+		];
+		const channel =  await guild.createChannel(this.channel.name,this.channel);
 		return channel;
 	}
 }
