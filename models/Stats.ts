@@ -68,7 +68,7 @@ export default class Stats{
 	}
 
 	getMinMaxMessage(): string {
-		return `The shortest streak is ${this.getMinStreakHours()} hours and the longest streak is ${this.getMaxStreakDays()}`;
+		return `The shortest streak is ${this.getMinStreakHours()} hours and the longest streak is ${this.getMaxStreakDays()} days`;
 	}
 
 	getStatParagraph(): string {
