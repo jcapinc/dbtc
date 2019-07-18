@@ -5,6 +5,7 @@ import UserCommand from "./models/UserCommand";
 import Initializer from "./models/Initializer";
 import { Streak } from "./models/Streak";
 import { Assigner } from "./models/Assigner";
+import Stats from "./models/Stats";
 
 config();
 
@@ -71,6 +72,17 @@ UserCommand.register(new UserCommand(/^\!update/, async function(message){
 	try{
 		await Assigner.assign(message);
 		message.channel.send(await Streak.update(message.member.user));
+	} catch(err) {
+		let ex: Error = err;
+		message.channel.send(ex.message);
+		console.log(ex);
+	}
+}));
+
+UserCommand.register(new UserCommand(/^\!stats/, async function(message){
+	try{
+		message.channel.send( await Stats.getStats());
+		return;
 	} catch(err) {
 		let ex: Error = err;
 		message.channel.send(ex.message);
