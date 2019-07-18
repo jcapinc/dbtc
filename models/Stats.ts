@@ -64,7 +64,7 @@ export default class Stats{
 	}
 
 	getDurationStatMessage(): string {
-		return `The average streak is ${this.getAverageStreakDays()} days, totalling ${this.getStreakTotalDays()}`;
+		return `The average streak is ${this.getAverageStreakDays()} days. All the streaks combined total ${this.getStreakTotalDays()} days`;
 	}
 
 	getMinMaxMessage(): string {
