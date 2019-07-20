@@ -1,0 +1,14 @@
+[Unit]
+Description=Dont Break the Chain Discord Bot
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=service-user
+ExecStart='cd path to service directory' node build/index.js
+
+[Install]
+WantedBy=multi-user.target
