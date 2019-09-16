@@ -4,6 +4,8 @@ import { FileManager } from "./Database";
 export class Streak{
 	public memberid: string;
 	public start: string;
+	public streak: number = 0;
+	public membername: string;
 
 	public static async relapse(member: User | string, days?: number, hours?: number ): Promise<Streak>{
 		const manager = new FileManager();
@@ -31,7 +33,9 @@ export class Streak{
 		if(streak === undefined){
 			return "You have no streak on record, type !relapse to begin your streak, or !relapse (days) (hours)";
 		}
-		return streak.update();
+		const result = streak.update();
+		manager.save(db);
+		return result;
 	}
 
 	public update(): string{
@@ -39,6 +43,8 @@ export class Streak{
 		const rawDays = rawDifference / (1000*60*60*24);
 		const days = Math.floor(rawDays);
 		const hours = Math.floor((rawDays - days) * 24);
+		this.streak = rawDifference;
+
 		return `Streak started ${days} days and ${hours} hours ago`;
 	}
 

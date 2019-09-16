@@ -32,16 +32,15 @@ export default class Stats{
 	}
 
 	getMaxStreakMS(): number {
-		const now = (new Date()).getTime();
-		return this.db.streaks.reduce<number>((carry,streak) => Math.max(now - streak.getStartDate().getTime(), carry),0);
+		return this.db.streaks.reduce<number>((carry,streak) => Math.max(streak.streak, carry),0);
 	}
+
 	getMaxStreakDays(): number {
 		return Math.round(this.getMaxStreakMS() / day);
 	}
 
 	getMinStreakMS(): number {
-		const now = (new Date()).getTime();
-		return this.db.streaks.reduce<number>((carry,streak) => Math.min(now - streak.getStartDate().getTime(), carry),Number.MAX_SAFE_INTEGER);
+		return this.db.streaks.reduce((carry,streak) => Math.min(streak.streak, carry), Number.MAX_SAFE_INTEGER);
 	}
 
 	getMinStreakHours(): number {
@@ -49,10 +48,7 @@ export default class Stats{
 	}
 
 	getStreakTotalMS(): number {
-		const now = (new Date()).getTime();
-		return this.db.streaks.reduce<number>((carry,streak) => {
-			return carry + now - streak.getStartDate().getTime()
-		},0);
+		return this.db.streaks.reduce((carry,streak) => carry + streak.streak,0);
 	}
 
 	getStreakTotalDays(){
