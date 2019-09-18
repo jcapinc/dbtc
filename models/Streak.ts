@@ -69,6 +69,7 @@ export class Streak{
 			date.setHours(date.getHours() - hours);
 		}
 		this.start = date.toString();
+		this.streak = (new Date()).getTime() - date.getTime();
 		return date;
 	}
 
