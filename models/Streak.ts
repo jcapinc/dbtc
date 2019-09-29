@@ -62,12 +62,8 @@ export class Streak{
 
 	public relapse(days?: number, hours?: number): Date {
 		const date = new Date();
-		if(days){
-			date.setDate(date.getDate() - days);
-		}
-		if(hours){
-			date.setHours(date.getHours() - hours);
-		}
+		if(days) date.setDate(date.getDate() - days);
+		if(hours) date.setHours(date.getHours() - hours);
 		this.start = date.toString();
 		this.streak = (new Date()).getTime() - date.getTime();
 		return date;

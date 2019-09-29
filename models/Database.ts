@@ -2,12 +2,18 @@ import { readFile, writeFile, access, constants } from "fs";
 import { Streak } from "./Streak";
 import { StreakGroup } from "./Initializer";
 
+export interface Settings{
+	restrictedChannel?: string;
+}
+
 export class Database {
+	public settings: Settings;
 	public streaks: Array<Streak>;
 	public profile: Array<StreakGroup>;
 
 	public toString(): string {
 		return JSON.stringify({
+			settings: this.settings,
 			streaks: this.streaks,
 			profile: this.profile.map(s => {
 				return {
@@ -25,6 +31,7 @@ export class Database {
 		const db = new Database()
 		db.streaks = value.streaks ? value.streaks.map(s => Object.assign(new Streak(),s)): [];
 		db.profile = value.profile ? value.profile.map(s => Object.assign(new StreakGroup(""),s)): [];
+		db.settings = value.settings ? Object.assign({}, db.settings || {},value.settings): {};
 		return db;
 	}
 

@@ -1,12 +1,12 @@
 import { Client, Message } from "discord.js";
 import { config } from "dotenv";
-
 import UserCommand from "./models/UserCommand";
 import Initializer from "./models/Initializer";
 import { Streak } from "./models/Streak";
 import { Assigner } from "./models/Assigner";
 import Stats from "./models/Stats";
 import Rank from "./models/Rank";
+import Restrict from "./models/Restrict";
 
 config();
 
@@ -18,7 +18,18 @@ if(!process.env.TOKEN){
 const client = new Client();
 
 const day = 60 * 60 * 24 * 1000;
+
+const restricted = async (message: Message) => {
+	const ChannelName = await Restrict.isRestricted(message);
+	if(ChannelName){
+		message.channel.send("Please post updates to the streak update channel: #" + ChannelName);
+		return true;
+	}
+	return false;
+};
+
 UserCommand.register(new UserCommand(/^\!initialize/, async function(message){
+	if(!message.member.hasPermission("ADMINISTRATOR")) return;
 	try{
 		message.channel.sendMessage("Received, initializing....");
 		const init = new Initializer(message);
@@ -33,6 +44,7 @@ UserCommand.register(new UserCommand(/^\!initialize/, async function(message){
 
 UserCommand.register(new UserCommand(/^\!relapse$/, async function(message){
 	try{
+		if(await restricted(message)) return false;
 		const streak = await Streak.relapse(message.member.user);
 		await Assigner.assign(message,streak);
 		message.channel.send("Don't be dejected. Shame can only drive you further into relapse.\r\n"+streak.update());
@@ -45,6 +57,7 @@ UserCommand.register(new UserCommand(/^\!relapse$/, async function(message){
 
 UserCommand.register(new UserCommand(/^!relapse\s+([0-9]+)$/, async function(this:UserCommand, message){
 	try{
+		if(await restricted(message)) return false;
 		const results = this.matcher.exec(message.content);
 		const streak = await Streak.relapse(message.member.user, parseInt(results[1]));
 		await Assigner.assign(message, streak);
@@ -58,6 +71,7 @@ UserCommand.register(new UserCommand(/^!relapse\s+([0-9]+)$/, async function(thi
 
 UserCommand.register(new UserCommand(/^!relapse\s+([0-9]+)\s+([0-9]+)$/, async function(this:UserCommand, message){
 	try{
+		if(await restricted(message)) return false;
 		const results = this.matcher.exec(message.content);
 		const streak = await Streak.relapse(message.member.user, parseInt(results[1]), parseInt(results[2]));
 		await Assigner.assign(message,streak);
@@ -71,6 +85,7 @@ UserCommand.register(new UserCommand(/^!relapse\s+([0-9]+)\s+([0-9]+)$/, async f
 
 UserCommand.register(new UserCommand(/^\!update/, async function(message){
 	try{
+		if(await restricted(message)) return false;
 		await Assigner.assign(message);
 		message.channel.send(await Streak.update(message.member.user));
 	} catch(err) {
@@ -100,6 +115,25 @@ UserCommand.register(new UserCommand(/^\!rank/, async function(message){
 		message.channel.send(ex.message);
 		console.log(ex);
 	}
+}));
+
+UserCommand.register(new UserCommand(/^\!restrict/, async function(message){
+	if(!message.member.hasPermission("ADMINISTRATOR")) return;
+	Restrict.Restrict(message);
+	message.channel.send("Updates and Relapses are restricted to this channel. Type !unrestrict to remove this restriction")
+}));
+
+UserCommand.register(new UserCommand(/^\!unrestrict/, async function(message){
+	if(!message.member.hasPermission("ADMINISTRATOR")) return;
+	Restrict.Unrestrict();
+	message.channel.send("Restriction remove, updates and relapses can be made from any channel");
+}));
+
+UserCommand.register(new UserCommand(/^\!guide/, async function(message){
+	message.channel.send("Type `!relapse <days> <hours>` to start a streak, or just `!relapse` to start a streak now. \r\n"+
+		"Type `!update` after you have started a streak to update statistics \r\n"+
+		"and find out how long you have been tracking your streak\r\n"+
+		"Type `!rank` and `!stats` to see additional rank or stats");
 }));
 
 client.on('ready', () => console.log(`Logged in as ${client.user.tag}`));
