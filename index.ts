@@ -133,7 +133,7 @@ UserCommand.register(new UserCommand(/^!rank\s([0-9]+)\-([0-9]+)\s?$/, async fun
 	}
 }));
 
-UserCommand.register(new UserCommand(/\!myrank/, async function(message){
+UserCommand.register(new UserCommand(/^\!myrank/, async function(message){
 	try{
 		return message.channel.send(await Rank.getMemberRank(message));
 	} catch(err){
