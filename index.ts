@@ -29,7 +29,10 @@ const restricted = async (message: Message) => {
 };
 
 UserCommand.register(new UserCommand(/^\!initialize/, async function(message){
-	if(!message.member.hasPermission("ADMINISTRATOR")) return;
+	if(!message.member.hasPermission("ADMINISTRATOR")){
+		message.channel.send("this is an admin-only command");
+		return;
+	}
 	try{
 		message.channel.sendMessage("Received, initializing....");
 		const init = new Initializer(message);
@@ -118,13 +121,19 @@ UserCommand.register(new UserCommand(/^\!rank/, async function(message){
 }));
 
 UserCommand.register(new UserCommand(/^\!restrict/, async function(message){
-	if(!message.member.hasPermission("ADMINISTRATOR")) return;
+	if(!message.member.hasPermission("ADMINISTRATOR")){
+		message.channel.send("this is an admin-only command");
+		return;
+	}
 	Restrict.Restrict(message);
 	message.channel.send("Updates and Relapses are restricted to this channel. Type !unrestrict to remove this restriction")
 }));
 
 UserCommand.register(new UserCommand(/^\!unrestrict/, async function(message){
-	if(!message.member.hasPermission("ADMINISTRATOR")) return;
+	if(!message.member.hasPermission("ADMINISTRATOR")){
+		message.channel.send("this is an admin-only command");
+		return;
+	}
 	Restrict.Unrestrict();
 	message.channel.send("Restriction remove, updates and relapses can be made from any channel");
 }));
