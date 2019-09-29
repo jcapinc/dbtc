@@ -109,10 +109,33 @@ UserCommand.register(new UserCommand(/^\!stats/, async function(message){
 	}
 }));
 
-UserCommand.register(new UserCommand(/^\!rank/, async function(message){
+UserCommand.register(new UserCommand(/^\!rank\s?$/, async function(message){
 	try{
-		message.channel.send(await Rank.getRank(message));
+		message.channel.send(await Rank.getRank(message) + "\r\n\r\nTry `!rank 10-20` or `!myrank` for more information");
 		return;
+	} catch(err){
+		let ex: Error = err;
+		message.channel.send(ex.message);
+		console.log(ex);
+	}
+}));
+
+UserCommand.register(new UserCommand(/^!rank\s([0-9]+)\-([0-9]+)\s?$/, async function(message){
+	try{
+		const match = this.matcher.exec(message.content);
+		const start = parseInt(match[1]) || 1;
+		const end = parseInt(match[2]) || 10;
+		message.channel.send(await Rank.getRank(message, start - 1, end - 1));
+	} catch(err){
+		let ex: Error = err;
+		message.channel.send(ex.message);
+		console.log(ex);
+	}
+}));
+
+UserCommand.register(new UserCommand(/\!myrank/, async function(message){
+	try{
+		return message.channel.send(await Rank.getMemberRank(message));
 	} catch(err){
 		let ex: Error = err;
 		message.channel.send(ex.message);

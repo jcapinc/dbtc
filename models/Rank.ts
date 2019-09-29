@@ -7,23 +7,42 @@ export default class Rank {
 		this.db = db;
 	}
 
-	async getRank(message: Message){
-		const ps = this.db.streaks.sort((a,b) => {
+	getUserRank(message: Message){
+		return this.getSortedStreaks().findIndex(streak => streak.memberid === message.member.id);
+	}
+
+	getSortedStreaks(){
+		return this.db.streaks.sort((a,b) => {
 			if(a.streak == b.streak) return 0;
 			if(a.streak > b.streak) return -1;
 			return 1;
-		}).slice(0,10).map(async (streak, index) => {
-			const user = await message.client.fetchUser(streak.memberid);
-			return `#${index + 1}: ${user.username}: ${Math.round(streak.streak / 60 / 60 / 24 / 1000)} days`
-		});
-		return "Top Ten Updated Streaks\r\n" + (await Promise.all(ps)).join("\r\n");
+		})
 	}
 
-	static async getRank(message: Message){
+	async getRank(message: Message, start: number, end: number){
+		if( end < start ) [start, end] = [end, start];
+		if(end - start > 50) end = start + 50;
+		const ps = this.getSortedStreaks().slice(start,end).map(async (streak, index) => {
+			const user = await message.client.fetchUser(streak.memberid);
+			const ret = `#${start + index + 1}: ${user.username}: ${Math.round(streak.streak / 60 / 60 / 24 / 1000)} days`
+			if(user.id === message.member.id) return `**${ret}**`;
+			return ret;
+		});
+		return `Top Updated Streaks(${start+1} to ${end+1})\r\n` + (await Promise.all(ps)).join("\r\n");
+	}
+
+	static async getMemberRank(message: Message){
+		const fm = new FileManager();
+		const r = new Rank(await fm.load());
+		const index = r.getUserRank(message);
+		return await r.getRank(message, Math.max(0, index - 5), index + 5);
+	}
+
+	static async getRank(message: Message, start: number = 0, end: number = 9){
 		const fm = new FileManager();
 		const db = await fm.load();
 		const r = new Rank(db);
-		return await r.getRank(message);
+		return await r.getRank(message, start, end);
 	}
 
 }

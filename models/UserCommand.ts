@@ -15,7 +15,7 @@ export default class UserCommand implements iUserCommand {
 	action: (command: Message) => void;
 	outMethod: (output: string) => void;
 
-	constructor(matcher: RegExp, action: (message: Message) => void){
+	constructor(matcher: RegExp, action: (this: UserCommand,message: Message) => void){
 		this.action = action;
 		this.matcher = matcher;
 		this.setOutMethod((output: string) => console.log(output));
