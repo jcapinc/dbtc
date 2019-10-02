@@ -21,14 +21,14 @@ export default class Rank {
 
 	async getRank(message: Message, start: number, end: number){
 		if( end < start ) [start, end] = [end, start];
-		if(end - start > 50) end = start + 50;
+		if(end - start > 50) end = start + 50; 
 		const ps = this.getSortedStreaks().slice(start,end).map(async (streak, index) => {
 			const user = await message.client.fetchUser(streak.memberid);
 			const ret = `#${start + index + 1}: ${user.username}: ${Math.round(streak.streak / 60 / 60 / 24 / 1000)} days`
 			if(user.id === message.member.id) return `**${ret}**`;
 			return ret;
 		});
-		return `Top Updated Streaks(${start+1} to ${end+1})\r\n` + (await Promise.all(ps)).join("\r\n");
+		return `Top Updated Streaks(${start+1} to ${end})\r\n` + (await Promise.all(ps)).join("\r\n");
 	}
 
 	static async getMemberRank(message: Message){

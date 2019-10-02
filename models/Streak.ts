@@ -31,7 +31,7 @@ export class Streak{
 		const memberid = this.resolveMember(member);
 		const streak = db.findStreakByMember(memberid);
 		if(streak === undefined){
-			return "You have no streak on record, type !relapse to begin your streak, or !relapse (days) (hours)";
+			return "!guide You have no streak on record, type `!relapse` to begin your streak, or `!relapse <days> <hours>";
 		}
 		const result = streak.update();
 		manager.save(db);

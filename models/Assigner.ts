@@ -22,7 +22,7 @@ export class Assigner{
 	public async assign(message: Message): Promise<Role> {
 		if(!this.profile) await this.getProfile();
 		if(!this.streak)  await this.getStreak(message);
-		if(!this.streak) throw new Error(`${message.member.displayName} you have no streak on record`);
+		if(!this.streak) throw new Error(`!guide ${message.member.displayName} you have no streak on record`);
 		let lastStreakInterval = 0;
 		const streaktime = (new Date()).getTime() - this.streak.getStartDate().getTime() + 1;
 		for(var sg of this.profile){

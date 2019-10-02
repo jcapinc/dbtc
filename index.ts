@@ -22,7 +22,7 @@ const day = 60 * 60 * 24 * 1000;
 const restricted = async (message: Message) => {
 	const ChannelName = await Restrict.isRestricted(message);
 	if(ChannelName){
-		message.channel.send("Please post updates to the streak update channel: #" + ChannelName);
+		message.channel.send("Please post updates to the streak update channel: <#" + ChannelName + ">");
 		return true;
 	}
 	return false;
@@ -109,6 +109,17 @@ UserCommand.register(new UserCommand(/^\!stats/, async function(message){
 	}
 }));
 
+UserCommand.register(new UserCommand(/^\!groupstats/, async function(message){
+	try{
+		message.channel.send(await Stats.getGroupStats());
+		return;
+	} catch(err) {
+		let ex: Error = err;
+		message.channel.send(ex.message);
+		console.log(ex);
+	}
+}))
+
 UserCommand.register(new UserCommand(/^\!rank\s?$/, async function(message){
 	try{
 		message.channel.send(await Rank.getRank(message) + "\r\n\r\nTry `!rank 10-20` or `!myrank` for more information");
@@ -162,7 +173,10 @@ UserCommand.register(new UserCommand(/^\!unrestrict/, async function(message){
 }));
 
 UserCommand.register(new UserCommand(/^\!guide/, async function(message){
-	message.channel.send("Type `!relapse <days> <hours>` to start a streak, or just `!relapse` to start a streak now. \r\n"+
+	message.channel.send("Type `!relapse <days> <hours>` to start a streak, \r\n"+
+		"or just `!relapse` to start a streak now. For Example:\r\n"+
+		"If you relapsed three days ago, type `relapse 3`. \r\n"+
+		"if you relapsed 12 hours ago, type `!relapse 0 12`\r\n\r\n "+
 		"Type `!update` after you have started a streak to update statistics \r\n"+
 		"and find out how long you have been tracking your streak\r\n"+
 		"Type `!rank` and `!stats` to see additional rank or stats");

@@ -7,7 +7,8 @@
     "test": "mocha -r ts-node/register tests/**/*.ts",
     "build": "tsc",
     "run": "node build/index.js",
-    "start": "run-s build run"
+    "start": "run-s build run",
+    "develop": "nodemon --inspect -e ts -w index.ts -w models --exec \"npm run start\""
   },
   "author": "",
   "license": "ISC",
@@ -21,6 +22,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
+    "nodemon": "^1.19.3",
     "ts-node": "^8.3.0"
   }
 }

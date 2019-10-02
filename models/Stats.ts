@@ -16,6 +16,38 @@ export default class Stats{
 		return stats.getStatParagraph();
 	}
 
+	static async getGroupStats(){
+		const fm = new FileManager();
+		const db = await fm.load();
+		const stats = new this(db);
+		return stats.getGroupStatList();
+	}
+
+	getGroupStatList(): string {
+		const groups: Record<string, number> = {};
+		this.db.profile.map(group => {
+			groups[group.channel.name] = 0;
+		});
+		this.db.streaks.map(streak => {
+			let lastStreakInterval = 0;
+			for(let i = 0; i < Object.keys(groups).length; i++){
+				if(streak.streak >= lastStreakInterval && streak.streak < this.db.profile[i].endInterval){
+					return groups[Object.keys(groups)[i]]++;
+				}
+				lastStreakInterval = this.db.profile[i].endInterval;
+			}
+		});
+		const maxNameLength = Object.keys(groups).reduce((carry,groupname) => 
+			Math.max(carry,groupname.length),0)
+		const maxCountLength =Object.keys(groups).reduce((carry,groupname) => 
+			Math.max(carry,groups[groupname].toString().length),0)
+		return 'Streak Group Stats by Streak Group: ```\r\n' +
+			Object.keys(groups).map(groupName => 
+				`${groupName}:${' '.repeat(maxNameLength - groupName.length + 1)}`+
+				`${' '.repeat(maxCountLength - groups[groupName].toString().length)}${groups[groupName]}`
+			).join("\r\n")+ '\r\n```' 
+	}
+
 	getMemberCount(): number {
 		return this.db.streaks.length;
 	}
@@ -68,6 +100,7 @@ export default class Stats{
 	}
 
 	getStatParagraph(): string {
-		return `\n${this.getMemberCountMessage()}\n${this.getMinMaxMessage()}\n${this.getDurationStatMessage()}`;
+		return `\n${this.getMemberCountMessage()}\n${this.getMinMaxMessage()}\n${this.getDurationStatMessage()}`+
+			"\r\n\r\n try `!groupstats` for more information";
 	}
 }
