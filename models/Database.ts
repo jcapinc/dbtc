@@ -1,4 +1,4 @@
-import { readFile, writeFile, access, constants } from "fs";
+import { readFile, writeFile, access, constants, copyFile } from "fs";
 import { Streak } from "./Streak";
 import { StreakGroup } from "./Initializer";
 
@@ -75,6 +75,18 @@ export class FileManager {
 			else resolve(data.toString());
 		}));
 		return Database.parse(JSON.parse(await promise));
+	}
+
+	public backup(): Promise<string>{
+		return new Promise((resolve,reject) => {
+			const date = new Date();
+			const datestring = [date.getFullYear(),date.getMonth(),date.getDate(),"-",date.getHours(),date.getMinutes(),date.getSeconds()].join("");
+			const filename = `db-backup-${datestring}.json`;
+			copyFile(this.filename,filename,err => {
+				if(err) reject(err);
+				resolve(filename)
+			})
+		});
 	}
 }
 

@@ -7,6 +7,7 @@ import { Assigner } from "./models/Assigner";
 import Stats from "./models/Stats";
 import Rank from "./models/Rank";
 import Restrict from "./models/Restrict";
+import { FileManager } from "./models/Database";
 
 config();
 
@@ -22,7 +23,7 @@ const day = 60 * 60 * 24 * 1000;
 const restricted = async (message: Message) => {
 	const ChannelName = await Restrict.isRestricted(message);
 	if(ChannelName){
-		message.channel.send("Please post updates to the streak update channel: <#" + ChannelName + ">");
+		message.channel.send("Please post updates to the streak update channel: #" + ChannelName);
 		return true;
 	}
 	return false;
@@ -180,6 +181,36 @@ UserCommand.register(new UserCommand(/^\!guide/, async function(message){
 		"Type `!update` after you have started a streak to update statistics \r\n"+
 		"and find out how long you have been tracking your streak\r\n"+
 		"Type `!rank` and `!stats` to see additional rank or stats");
+}));
+
+UserCommand.register(new UserCommand(/^\!backup.*/, async function(message){
+	if(!message.member.hasPermission("ADMINISTRATOR")){
+		message.channel.send("this is an admin-only command");
+		return;
+	}
+	try{
+		const result = await (new FileManager()).backup();
+		message.channel.send(`new backup created: ${result}`);
+	}
+	catch(e){
+		message.channel.send(e);
+		return;
+	}
+}));
+
+UserCommand.register(new UserCommand(/^\!delete\s(.+)/, async function(message){
+	if(!message.member.hasPermission("BAN_MEMBERS")){
+		message.channel.send("You do not have elevated permissions to delete user streaks");
+		return;
+	}
+	try{
+		const results = this.matcher.exec(message.content);
+		message.channel.send((await Streak.delete(results[1],message)).message);
+		return;
+	}
+	catch(exception){
+		message.channel.send(exception+".");
+	}
 }));
 
 client.on('ready', () => console.log(`Logged in as ${client.user.tag}`));

@@ -1,5 +1,13 @@
-import { User } from "discord.js";
+import { User, Message } from "discord.js";
 import { FileManager } from "./Database";
+import Rank from "./Rank";
+
+export type deleteCode = "DELETED" | "NOT_FOUND" | "IDENTIFIED";
+
+export interface deleteResponse{
+	code: deleteCode;
+	message: string;
+}
 
 export class Streak{
 	public memberid: string;
@@ -71,5 +79,29 @@ export class Streak{
 
 	public getStartDate(): Date {
 		return new Date(this.start);
+	}
+
+	public static async delete(input: string, message: Message): Promise<deleteResponse> {
+		const manager = new FileManager();
+		const db = await manager.load();
+		const streak = db.streaks.findIndex(streak => streak.memberid === input);
+		if(streak === -1){
+			const rank = new Rank(db);
+			const sorted = rank.getSortedStreaks();
+			if(!sorted[parseInt(input) - 1]){
+				throw new Error("Could not find a streak that matches that input. Please type `!delete <ranknumber>` or `!delete <memberid>`");
+			}
+			const member = message.guild.members.get(sorted[parseInt(input) - 1].memberid);
+			return {
+				code: "IDENTIFIED",
+				message: `user identified by rank ${input} type \`!delete ${member.id}\` to delete the streak of the user named ${member.displayName}`
+			}
+		}
+		const [member] = db.streaks.splice(streak,1);
+		manager.save(db);
+		return {
+			code: "DELETED",
+			message: `user ${message.guild.members.get(member.memberid).displayName}'s streak was deleted`
+		}
 	}
 }
