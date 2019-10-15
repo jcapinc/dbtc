@@ -91,17 +91,17 @@ export class Streak{
 			if(!sorted[parseInt(input) - 1]){
 				throw new Error("Could not find a streak that matches that input. Please type `!delete <ranknumber>` or `!delete <memberid>`");
 			}
-			const member = message.guild.members.get(sorted[parseInt(input) - 1].memberid);
+			const member = await message.client.fetchUser(sorted[parseInt(input) - 1].memberid);
 			return {
 				code: "IDENTIFIED",
-				message: `user identified by rank ${input} type \`!delete ${member.id}\` to delete the streak of the user named ${member.displayName}`
+				message: `user identified by rank ${input} type \`!delete ${sorted[parseInt(input) - 1].memberid}\` to delete the streak of the user named ${member.username}`
 			}
 		}
 		const [member] = db.streaks.splice(streak,1);
 		manager.save(db);
 		return {
 			code: "DELETED",
-			message: `user ${message.guild.members.get(member.memberid).displayName}'s streak was deleted`
+			message: `user ${(await message.client.fetchUser(member.memberid)).username}'s streak was deleted`
 		}
 	}
 }
