@@ -171,11 +171,9 @@ UserCommand.register(new UserCommand(/^\!guide/, async function(message){
 		"and find out how long you have been tracking your streak\r\n"+
 		"Type `!rank` and `!stats` to see additional rank or stats");
 }));
-
 //#endregion
 
 //#region Admin Commands
-
 UserCommand.register(new UserCommand(/^\!initialize/, async function(message){
 	if(!message.member.hasPermission("ADMINISTRATOR")){
 		message.channel.send("this is an admin-only command");
@@ -285,7 +283,6 @@ UserCommand.register(new UserCommand(/^\!admin\schangeinterval\s([0-9]+)\s([0-9]
 		message.channel.send(exception+'.');
 	}
 }));
-
 //#endregion
 
 client.on('ready', () => console.log(`Logged in as ${client.user.tag}`));

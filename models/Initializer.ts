@@ -20,7 +20,7 @@ export default class Initializer {
 		"4rd to 5th Month":    day * 150,
 		"6th to 11th Month":   day * 365,
 		"2nd Year":            day * 730,
-		"3rd Year to 6th Year":day * 1095,
+		"3rd Year to 6th Year":day * 2190,
 		"6th Year and Beyond": Number.MAX_SAFE_INTEGER
 	};
 
