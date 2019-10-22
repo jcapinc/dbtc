@@ -92,9 +92,32 @@ export class StreakGroup {
 		this.channel.permissionOverwrites = this.channel.permissionOverwrites || [
 			{id: guild.defaultRole, deny:  "VIEW_CHANNEL" },
 			{id: role,              allow: "VIEW_CHANNEL" }
-			//,{id: guild.owner,       allow: "VIEW_CHANNEL" }
 		];
 		const channel =  await guild.createChannel(this.channel.name,this.channel);
 		return channel;
+	}
+
+	static async list(){
+		const fm = new FileManager();
+		const db = await fm.load();
+		const profiles = db.profile.map(record => ({
+			days: Math.round(record.endInterval / 1000 / 60 / 60 / 24),
+			name: record.channel.name
+		}));
+		const maxLength = profiles.reduce((carry, record) => 
+			Math.max(carry, record.name.length + 1),0)
+		const columns = ["Streak Group", "End Days"];
+		const title = `##  ${columns[0]}${' '.repeat(maxLength - columns[0].length)}${columns[1]}\n` + 
+			`--  ${'-'.repeat(columns[0].length)}${' '.repeat(maxLength - columns[0].length)}${'-'.repeat(columns[1].length)}\n`;
+		return profiles.reduce((carry, record, index) => carry + ' '.repeat(2 - index.toString().length) + index.toString() +
+			`  ${record.name}${' '.repeat(maxLength - record.name.length)}${record.days}\n`,title);
+	}
+
+	static async changeStreakInterval(streakIndex, newIntervalDays){
+		const fm = new FileManager();
+		const db = await fm.load();
+		db.profile[streakIndex].endInterval = newIntervalDays * 24 * 60 * 60 * 1000;
+		await fm.save(db);
+		return this.list();
 	}
 }

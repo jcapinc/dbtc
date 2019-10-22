@@ -94,7 +94,7 @@ export class Streak{
 			const member = await message.client.fetchUser(sorted[parseInt(input) - 1].memberid);
 			return {
 				code: "IDENTIFIED",
-				message: `user identified by rank ${input} type \`!delete ${sorted[parseInt(input) - 1].memberid}\` to delete the streak of the user named ${member.username}`
+				message: `user identified by rank ${input}. \nType \`!delete ${sorted[parseInt(input) - 1].memberid}\` to delete the streak of the user named ${member.username}`
 			}
 		}
 		const [member] = db.streaks.splice(streak,1);

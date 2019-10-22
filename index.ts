@@ -1,7 +1,7 @@
 import { Client, Message } from "discord.js";
 import { config } from "dotenv";
 import UserCommand from "./models/UserCommand";
-import Initializer from "./models/Initializer";
+import Initializer, { StreakGroup } from "./models/Initializer";
 import { Streak } from "./models/Streak";
 import { Assigner } from "./models/Assigner";
 import Stats from "./models/Stats";
@@ -210,6 +210,33 @@ UserCommand.register(new UserCommand(/^\!delete\s(.+)/, async function(message){
 	}
 	catch(exception){
 		message.channel.send(exception+".");
+	}
+}));
+
+UserCommand.register(new UserCommand(/^\!admin\sstreakgroups$/, async function(message){
+	if(!message.member.hasPermission("ADMINISTRATOR")){
+		message.channel.send("this is an admin-only command");
+		return;
+	}
+	try{
+		message.channel.send('```'+(await StreakGroup.list())+'```');
+	}
+	catch(exception){
+		message.channel.send(exception+'.');
+	}
+}));
+
+UserCommand.register(new UserCommand(/^\!admin\schangeinterval\s([0-9]+)\s([0-9]+)/, async function(message){
+	if(!message.member.hasPermission("ADMINISTRATOR")){
+		message.channel.send("this is an admin-only command");
+		return;
+	}
+	try{
+		const results = this.matcher.exec(message.content);
+		message.channel.send('```'+(await StreakGroup.changeStreakInterval(parseInt(results[1]),parseInt(results[2])))+'```');
+	}
+	catch(exception){
+		message.channel.send(exception+'.');
 	}
 }));
 
