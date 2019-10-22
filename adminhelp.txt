@@ -1,0 +1,10 @@
+```
+!admin                  Show this help message
+!admin restrict         Restrict updates and relapse commands to a 
+                        specific channel on the server
+!admin unrestrict       Remove restriction on update and relapse commands
+!admin backup           Backs up the database in place
+!admin delete           Delete a user streak
+!admin streakgroups     List streak groups with their end interval
+!admin changeinterval   Changes the interval on a streak groups
+```

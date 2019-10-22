@@ -1,0 +1,11 @@
+```
+!help         Show this helptext
+!relapse      Starts a streak. use !guide to learn more about how to use this
+!update       Shows you your progress on your streak, updates streak 
+              statistics puts you in your streak group
+!stats        Show general streak statistics for the server
+!groupstats   Show how many users are in each streak group
+!rank         Shows the top streaks on the server
+!myrank       Shows your rank and the streaks near your streak length
+!guide        Explains how to use !relapse and !update
+```

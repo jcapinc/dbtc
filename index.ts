@@ -8,6 +8,9 @@ import Stats from "./models/Stats";
 import Rank from "./models/Rank";
 import Restrict from "./models/Restrict";
 import { FileManager } from "./models/Database";
+import * as fs from 'fs';
+
+//#region Setup
 
 config();
 
@@ -29,20 +32,24 @@ const restricted = async (message: Message) => {
 	return false;
 };
 
-UserCommand.register(new UserCommand(/^\!initialize/, async function(message){
-	if(!message.member.hasPermission("ADMINISTRATOR")){
-		message.channel.send("this is an admin-only command");
-		return;
-	}
+//#endregion
+
+//#region User Commands
+UserCommand.register(new UserCommand(/^\!help$/, async function(message){
 	try{
-		message.channel.sendMessage("Received, initializing....");
-		const init = new Initializer(message);
-		await init.initialize();
-		message.channel.sendMessage("Channels should be created");
+		const helptext = await new Promise((resolve, reject) => {
+			fs.readFile('./help.txt',(err, data) => {
+				if(err) reject(err);
+				resolve(data.toString());
+			});
+		});
+		let admin = '';
+		if(message.member.hasPermission("ADMINISTRATOR")){
+			admin = "Type `!admin` to learn about admin commands";
+		}
+		message.channel.send(helptext+admin);
 	} catch(err) {
-		let ex: Error = err;
-		message.channel.send(ex.message);
-		console.log(ex);
+		message.channel.send(err + '.');
 	}
 }));
 
@@ -59,7 +66,7 @@ UserCommand.register(new UserCommand(/^\!relapse$/, async function(message){
 	}
 }));
 
-UserCommand.register(new UserCommand(/^!relapse\s+([0-9]+)$/, async function(this:UserCommand, message){
+UserCommand.register(new UserCommand(/^\!relapse\s+([0-9]+)$/, async function(this:UserCommand, message){
 	try{
 		if(await restricted(message)) return false;
 		const results = this.matcher.exec(message.content);
@@ -73,7 +80,7 @@ UserCommand.register(new UserCommand(/^!relapse\s+([0-9]+)$/, async function(thi
 	}
 }));
 
-UserCommand.register(new UserCommand(/^!relapse\s+([0-9]+)\s+([0-9]+)$/, async function(this:UserCommand, message){
+UserCommand.register(new UserCommand(/^\!relapse\s+([0-9]+)\s+([0-9]+)$/, async function(this:UserCommand, message){
 	try{
 		if(await restricted(message)) return false;
 		const results = this.matcher.exec(message.content);
@@ -132,7 +139,7 @@ UserCommand.register(new UserCommand(/^\!rank\s?$/, async function(message){
 	}
 }));
 
-UserCommand.register(new UserCommand(/^!rank\s([0-9]+)\-([0-9]+)\s?$/, async function(message){
+UserCommand.register(new UserCommand(/^\!rank\s([0-9]+)\-([0-9]+)\s?$/, async function(message){
 	try{
 		const match = this.matcher.exec(message.content);
 		const start = parseInt(match[1]) || 1;
@@ -155,24 +162,6 @@ UserCommand.register(new UserCommand(/^\!myrank/, async function(message){
 	}
 }));
 
-UserCommand.register(new UserCommand(/^\!restrict/, async function(message){
-	if(!message.member.hasPermission("ADMINISTRATOR")){
-		message.channel.send("this is an admin-only command");
-		return;
-	}
-	Restrict.Restrict(message);
-	message.channel.send("Updates and Relapses are restricted to this channel. Type !unrestrict to remove this restriction")
-}));
-
-UserCommand.register(new UserCommand(/^\!unrestrict/, async function(message){
-	if(!message.member.hasPermission("ADMINISTRATOR")){
-		message.channel.send("this is an admin-only command");
-		return;
-	}
-	Restrict.Unrestrict();
-	message.channel.send("Restriction remove, updates and relapses can be made from any channel");
-}));
-
 UserCommand.register(new UserCommand(/^\!guide/, async function(message){
 	message.channel.send("Type `!relapse <days> <hours>` to start a streak, \r\n"+
 		"or just `!relapse` to start a streak now. For Example:\r\n"+
@@ -183,7 +172,64 @@ UserCommand.register(new UserCommand(/^\!guide/, async function(message){
 		"Type `!rank` and `!stats` to see additional rank or stats");
 }));
 
-UserCommand.register(new UserCommand(/^\!backup.*/, async function(message){
+//#endregion
+
+//#region Admin Commands
+
+UserCommand.register(new UserCommand(/^\!initialize/, async function(message){
+	if(!message.member.hasPermission("ADMINISTRATOR")){
+		message.channel.send("this is an admin-only command");
+		return;
+	}
+	try{
+		message.channel.sendMessage("Received, initializing....");
+		const init = new Initializer(message);
+		await init.initialize();
+		message.channel.sendMessage("Channels should be created");
+	} catch(err) {
+		let ex: Error = err;
+		message.channel.send(ex.message);
+		console.log(ex);
+	}
+}));
+
+UserCommand.register(new UserCommand(/^\!admin$/, async function(message){
+	if(!message.member.hasPermission("ADMINISTRATOR")){
+		message.channel.send("This is an admin-only command");
+		return;
+	}
+	try{
+		message.channel.send(await new Promise((resolve, reject) => {
+			fs.readFile('./adminhelp.txt',(err, data) => {
+				if(err) reject(err);
+				resolve(data.toString());
+			});
+		}));
+	}
+	catch(err){
+		message.channel.send(err+'.');
+	}
+}));
+
+UserCommand.register(new UserCommand(/^\!admin\srestrict/, async function(message){
+	if(!message.member.hasPermission("ADMINISTRATOR")){
+		message.channel.send("this is an admin-only command");
+		return;
+	}
+	Restrict.Restrict(message);
+	message.channel.send("Updates and Relapses are restricted to this channel. Type !unrestrict to remove this restriction")
+}));
+
+UserCommand.register(new UserCommand(/^\!admin\sunrestrict/, async function(message){
+	if(!message.member.hasPermission("ADMINISTRATOR")){
+		message.channel.send("this is an admin-only command");
+		return;
+	}
+	Restrict.Unrestrict();
+	message.channel.send("Restriction remove, updates and relapses can be made from any channel");
+}));
+
+UserCommand.register(new UserCommand(/^\!admin\sbackup.*/, async function(message){
 	if(!message.member.hasPermission("ADMINISTRATOR")){
 		message.channel.send("this is an admin-only command");
 		return;
@@ -198,7 +244,7 @@ UserCommand.register(new UserCommand(/^\!backup.*/, async function(message){
 	}
 }));
 
-UserCommand.register(new UserCommand(/^\!delete\s(.+)/, async function(message){
+UserCommand.register(new UserCommand(/^\!admin\sdelete\s(.+)/, async function(message){
 	if(!message.member.hasPermission("BAN_MEMBERS")){
 		message.channel.send("You do not have elevated permissions to delete user streaks");
 		return;
@@ -239,6 +285,8 @@ UserCommand.register(new UserCommand(/^\!admin\schangeinterval\s([0-9]+)\s([0-9]
 		message.channel.send(exception+'.');
 	}
 }));
+
+//#endregion
 
 client.on('ready', () => console.log(`Logged in as ${client.user.tag}`));
 client.on('message', message => UserCommand.process(message));
