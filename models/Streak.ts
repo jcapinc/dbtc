@@ -89,12 +89,12 @@ export class Streak{
 			const rank = new Rank(db);
 			const sorted = rank.getSortedStreaks();
 			if(!sorted[parseInt(input) - 1]){
-				throw new Error("Could not find a streak that matches that input. Please type `!delete <ranknumber>` or `!delete <memberid>`");
+				throw new Error("Could not find a streak that matches that input. Please type `!admin delete <ranknumber>` or `!admin delete <memberid>`");
 			}
 			const member = await message.client.fetchUser(sorted[parseInt(input) - 1].memberid);
 			return {
 				code: "IDENTIFIED",
-				message: `user identified by rank ${input}. \nType \`!delete ${sorted[parseInt(input) - 1].memberid}\` to delete the streak of the user named ${member.username}`
+				message: `user identified by rank ${input}. \nType \`!admin delete ${sorted[parseInt(input) - 1].memberid}\` to delete the streak of the user named ${member.username}`
 			}
 		}
 		const [member] = db.streaks.splice(streak,1);

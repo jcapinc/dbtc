@@ -192,7 +192,7 @@ UserCommand.register(new UserCommand(/^\!initialize/, async function(message){
 }));
 
 UserCommand.register(new UserCommand(/^\!admin$/, async function(message){
-	if(!message.member.hasPermission("ADMINISTRATOR")){
+	if(!message.member.hasPermission("BAN_MEMBERS")){
 		message.channel.send("This is an admin-only command");
 		return;
 	}
@@ -258,7 +258,7 @@ UserCommand.register(new UserCommand(/^\!admin\sdelete\s(.+)/, async function(me
 }));
 
 UserCommand.register(new UserCommand(/^\!admin\sstreakgroups$/, async function(message){
-	if(!message.member.hasPermission("ADMINISTRATOR")){
+	if(!message.member.hasPermission("BAN_MEMBERS")){
 		message.channel.send("this is an admin-only command");
 		return;
 	}
