@@ -249,7 +249,9 @@ UserCommand.register(new UserCommand(/^\!admin\sdelete\s(.+)/, async function(me
 	}
 	try{
 		const results = this.matcher.exec(message.content);
-		message.channel.send((await Streak.delete(results[1],message)).message);
+		Promise.all(results[1].split(" ").map( async (id) => {
+			message.channel.send((await Streak.delete(id,message)).message);
+		}));
 		return;
 	}
 	catch(exception){
