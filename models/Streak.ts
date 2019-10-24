@@ -104,4 +104,24 @@ export class Streak{
 			message: `user ${(await message.client.fetchUser(member.memberid)).username}'s streak was deleted`
 		}
 	}
+
+	public static async old(message: Message, start: number = 0, end: number = 20){
+		const manager = new FileManager();
+		const db = await manager.load();
+		const streaks = db.streaks.map(streak => Object.assign({}, streak, {
+			age: (new Date()).getTime() - streak.streak - streak.getStartDate().getTime(),
+			name: (message.guild.members.get(streak.memberid) || {displayName: "*missing user*"}).displayName
+		})).sort((a,b) => {
+			if(a.age === b.age) return 0;
+			if(a.age < b.age) return 1;
+			return -1;
+		}).slice(start, end);
+		const maxLength = streaks.reduce((carry, streak) => Math.max(carry,streak.name.length), 0);
+		return '```' + streaks.map(streak => {
+			const age = Math.round(streak.age / (60 * 60 * 24 * 1000)).toString();
+			const nameBuffer = ' '.repeat(maxLength + 1 - streak.name.length);
+			const ageBuffer = ' '.repeat(5 - age.length + 1);
+			return `${streak.name}${nameBuffer}${age}${ageBuffer}${streak.memberid}`
+		}).join("\n") + '```';
+	}
 }

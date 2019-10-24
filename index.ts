@@ -283,6 +283,19 @@ UserCommand.register(new UserCommand(/^\!admin\schangeinterval\s([0-9]+)\s([0-9]
 		message.channel.send(exception+'.');
 	}
 }));
+
+UserCommand.register(new UserCommand(/^\!admin\soldstreaks$/, async function(message){
+	if(!message.member.hasPermission("BAN_MEMBERS")){
+		message.channel.send("this is an admin-only command");
+		return;
+	}
+	try {
+		message.channel.send(await Streak.old(message));
+	}
+	catch(exception){
+		message.channel.send(exception+'.');
+	}
+}))
 //#endregion
 
 client.on('ready', () => console.log(`Logged in as ${client.user.tag}`));
