@@ -1,4 +1,4 @@
-import { User, Message } from "discord.js";
+import { User, Message, GuildMember } from "discord.js";
 import { FileManager } from "./Database";
 import Rank from "./Rank";
 
@@ -81,27 +81,35 @@ export class Streak{
 		return new Date(this.start);
 	}
 
-	public static async delete(input: string, message: Message): Promise<deleteResponse> {
+	public static async delete(ids: string[], message: Message): Promise<deleteResponse> {
 		const manager = new FileManager();
 		const db = await manager.load();
-		const streak = db.streaks.findIndex(streak => streak.memberid === input);
-		if(streak === -1){
-			const rank = new Rank(db);
-			const sorted = rank.getSortedStreaks();
-			if(!sorted[parseInt(input) - 1]){
-				throw new Error("Could not find a streak that matches that input. Please type `!admin delete <ranknumber>` or `!admin delete <memberid>`");
+		const streaks: Streak[] = [];
+		for(let i = 0; i < ids.length; i++){
+			const streak = db.streaks.findIndex(streak => streak.memberid === ids[i]);
+			if(streak === -1){
+				const rank = new Rank(db);
+				const sorted = rank.getSortedStreaks();
+				if(!sorted[parseInt(ids[i]) - 1]){
+					continue;
+				} else {
+					const member = await message.client.fetchUser(sorted[parseInt(ids[i]) - 1].memberid);
+					return {
+						code: "IDENTIFIED",
+						message: `user identified by rank ${ids[i]}. \nType \`!admin delete ${sorted[parseInt(ids[i]) - 1].memberid}\` to delete the streak of the user named ${member.username}`
+					}
+				}
 			}
-			const member = await message.client.fetchUser(sorted[parseInt(input) - 1].memberid);
-			return {
-				code: "IDENTIFIED",
-				message: `user identified by rank ${input}. \nType \`!admin delete ${sorted[parseInt(input) - 1].memberid}\` to delete the streak of the user named ${member.username}`
-			}
+			streaks.push(db.streaks.splice(streak,1)[0]);
 		}
-		const [member] = db.streaks.splice(streak,1);
 		manager.save(db);
+
+		const userList = (await Promise.all(streaks.map(async (streak) => {
+			return (await message.client.fetchUser(streak.memberid)).username;
+		}))).join(", ")
 		return {
 			code: "DELETED",
-			message: `user ${(await message.client.fetchUser(member.memberid)).username}'s streak was deleted`
+			message: `user(s) '${userList}' streak(s) was deleted`
 		}
 	}
 

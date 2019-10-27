@@ -30,7 +30,12 @@ export default class Restrict{
 	}
 
 	static async Unrestrict(){
-
+		const manager = new FileManager();
+		const db = await manager.load();
+		const rest = new this(db);
+		rest.unrestrict();
+		manager.save(db);
+		return undefined;
 	}
 
 	unrestrict(){
