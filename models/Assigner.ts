@@ -31,7 +31,7 @@ export class Assigner{
 				if(!message.guild.roles.get(sg.roleid)){
 					throw new Error(`${guildMember.displayName} Something went wrong with server setup, im not able to assign you to your group`);
 				}
-				await this.setRole(guildMember, message.guild.roles.get(sg.roleid));
+				this.setRole(guildMember, message.guild.roles.get(sg.roleid));
 				return message.guild.roles[sg.roleid];
 			}
 			lastStreakInterval = sg.endInterval;
@@ -41,8 +41,12 @@ export class Assigner{
 
 	public async setRole(member: GuildMember, role: Role): Promise<void> {
 		if(member.roles.has(role.id)) return;
-		await member.removeRoles(this.profile.map(sg => sg.roleid));
-		await member.addRole(role.id);
+		try {
+			await member.removeRoles(this.profile.map(sg => sg.roleid));
+			await member.addRole(role.id);
+		} catch(e) {
+			return;
+		}
 		return;
 	}
 
