@@ -37,7 +37,7 @@ export class Database {
 
 	public findStreakByMember(memberid: string): Streak | undefined {
 		let streak: Streak;
-		this.streaks.map((s,i) => {
+		this.streaks.forEach((s,i) => {
 			if(s.memberid === memberid){
 				streak = this.streaks[i];
 			}

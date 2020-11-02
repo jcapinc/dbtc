@@ -11,10 +11,10 @@
     "develop": "nodemon --inspect -e ts -w index.ts -w models --exec \"npm run start\""
   },
   "author": "",
-  "license": "ISC",
+  "license": "ISC", 
   "dependencies": {
     "@types/node": "^12.7.11",
-    "discord.js": "^11.5.1",
+    "discord.js": "^11.6.4",
     "dotenv": "^8.0.0",
     "npm-run-all": "^4.1.5",
     "sinon": "^7.3.2",

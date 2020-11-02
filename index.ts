@@ -36,6 +36,7 @@ const restricted = async (message: Message) => {
 
 //#region User Commands
 UserCommand.register(new UserCommand(/^\!help$/, async function(message){
+	const guildMember = await message.guild.fetchMember(message.author);
 	try{
 		const helptext = await new Promise((resolve, reject) => {
 			fs.readFile('./help.txt',(err, data) => {
@@ -44,7 +45,7 @@ UserCommand.register(new UserCommand(/^\!help$/, async function(message){
 			});
 		});
 		let admin = '';
-		if(message.member.hasPermission("ADMINISTRATOR")){
+		if (guildMember.hasPermission("ADMINISTRATOR")) {
 			admin = "Type `!admin` to learn about admin commands";
 		}
 		message.channel.send(helptext+admin);
@@ -56,7 +57,8 @@ UserCommand.register(new UserCommand(/^\!help$/, async function(message){
 UserCommand.register(new UserCommand(/^\!relapse$/, async function(message){
 	try{
 		if(await restricted(message)) return false;
-		const streak = await Streak.relapse(message.member.user);
+		console.log(Object.keys(message));
+		const streak = await Streak.relapse(message.author);
 		await Assigner.assign(message,streak);
 		message.channel.send("Don't be dejected. Shame can only drive you further into relapse.\r\n"+streak.update());
 	} catch(err) {
@@ -70,7 +72,7 @@ UserCommand.register(new UserCommand(/^\!relapse\s+([0-9]+)$/, async function(th
 	try{
 		if(await restricted(message)) return false;
 		const results = this.matcher.exec(message.content);
-		const streak = await Streak.relapse(message.member.user, parseInt(results[1]));
+		const streak = await Streak.relapse(message.author, parseInt(results[1]));
 		await Assigner.assign(message, streak);
 		message.channel.send(streak.update());
 	} catch(err) {
@@ -84,7 +86,7 @@ UserCommand.register(new UserCommand(/^\!relapse\s+([0-9]+)\s+([0-9]+)$/, async 
 	try{
 		if(await restricted(message)) return false;
 		const results = this.matcher.exec(message.content);
-		const streak = await Streak.relapse(message.member.user, parseInt(results[1]), parseInt(results[2]));
+		const streak = await Streak.relapse(message.author, parseInt(results[1]), parseInt(results[2]));
 		await Assigner.assign(message,streak);
 		message.channel.send(streak.update());
 	} catch(err) {
@@ -98,7 +100,7 @@ UserCommand.register(new UserCommand(/^\!update/, async function(message){
 	try{
 		if(await restricted(message)) return false;
 		await Assigner.assign(message);
-		message.channel.send(await Streak.update(message.member.user));
+		message.channel.send(await Streak.update(message.author));
 	} catch(err) {
 		let ex: Error = err;
 		message.channel.send(ex.message);
@@ -175,7 +177,11 @@ UserCommand.register(new UserCommand(/^\!guide/, async function(message){
 
 //#region Admin Commands
 UserCommand.register(new UserCommand(/^\!initialize/, async function(message){
-	if(!message.member.hasPermission("ADMINISTRATOR")){
+	const guildMember = await message.guild.fetchMember(message.author);
+	if (typeof guildMember !== 'object') {
+		message.channel.send("Cannot find guild member to ascertain permissions, access denied");
+	}
+	if(!guildMember.hasPermission("ADMINISTRATOR")){
 		message.channel.send("this is an admin-only command");
 		return;
 	}
@@ -192,7 +198,8 @@ UserCommand.register(new UserCommand(/^\!initialize/, async function(message){
 }));
 
 UserCommand.register(new UserCommand(/^\!admin$/, async function(message){
-	if(!message.member.hasPermission("BAN_MEMBERS")){
+	const guildMember = await message.guild.fetchMember(message.author);
+	if(!guildMember.hasPermission("BAN_MEMBERS")){
 		message.channel.send("This is an admin-only command");
 		return;
 	}
@@ -210,7 +217,8 @@ UserCommand.register(new UserCommand(/^\!admin$/, async function(message){
 }));
 
 UserCommand.register(new UserCommand(/^\!admin\srestrict/, async function(message){
-	if(!message.member.hasPermission("ADMINISTRATOR")){
+	const guildMember = await message.guild.fetchMember(message.author);
+	if(!guildMember.hasPermission("ADMINISTRATOR")){
 		message.channel.send("this is an admin-only command");
 		return;
 	}
@@ -219,7 +227,8 @@ UserCommand.register(new UserCommand(/^\!admin\srestrict/, async function(messag
 }));
 
 UserCommand.register(new UserCommand(/^\!admin\sunrestrict/, async function(message){
-	if(!message.member.hasPermission("ADMINISTRATOR")){
+	const guildMember = await message.guild.fetchMember(message.author);
+	if(!guildMember.hasPermission("ADMINISTRATOR")){
 		message.channel.send("this is an admin-only command");
 		return;
 	}
@@ -228,7 +237,8 @@ UserCommand.register(new UserCommand(/^\!admin\sunrestrict/, async function(mess
 }));
 
 UserCommand.register(new UserCommand(/^\!admin\sbackup.*/, async function(message){
-	if(!message.member.hasPermission("ADMINISTRATOR")){
+	const guildMember = await message.guild.fetchMember(message.author);
+	if(!guildMember.hasPermission("ADMINISTRATOR")){
 		message.channel.send("this is an admin-only command");
 		return;
 	}
@@ -243,7 +253,8 @@ UserCommand.register(new UserCommand(/^\!admin\sbackup.*/, async function(messag
 }));
 
 UserCommand.register(new UserCommand(/^\!admin\sdelete\s(.+)/, async function(message){
-	if(!message.member.hasPermission("BAN_MEMBERS")){
+	const guildMember = await message.guild.fetchMember(message.author);
+	if(!guildMember.hasPermission("BAN_MEMBERS")){
 		message.channel.send("You do not have elevated permissions to delete user streaks");
 		return;
 	}
@@ -259,7 +270,8 @@ UserCommand.register(new UserCommand(/^\!admin\sdelete\s(.+)/, async function(me
 }));
 
 UserCommand.register(new UserCommand(/^\!admin\sstreakgroups$/, async function(message){
-	if(!message.member.hasPermission("BAN_MEMBERS")){
+	const guildMember = await message.guild.fetchMember(message.author);
+	if(!guildMember.hasPermission("BAN_MEMBERS")){
 		message.channel.send("this is an admin-only command");
 		return;
 	}
@@ -272,7 +284,8 @@ UserCommand.register(new UserCommand(/^\!admin\sstreakgroups$/, async function(m
 }));
 
 UserCommand.register(new UserCommand(/^\!admin\schangeinterval\s([0-9]+)\s([0-9]+)/, async function(message){
-	if(!message.member.hasPermission("ADMINISTRATOR")){
+	const guildMember = await message.guild.fetchMember(message.author);
+	if(!guildMember.hasPermission("ADMINISTRATOR")){
 		message.channel.send("this is an admin-only command");
 		return;
 	}
@@ -286,7 +299,8 @@ UserCommand.register(new UserCommand(/^\!admin\schangeinterval\s([0-9]+)\s([0-9]
 }));
 
 UserCommand.register(new UserCommand(/^\!admin\soldstreaks$/, async function(message){
-	if(!message.member.hasPermission("BAN_MEMBERS")){
+	const guildMember = await message.guild.fetchMember(message.author);
+	if(!guildMember.hasPermission("BAN_MEMBERS")){
 		message.channel.send("this is an admin-only command");
 		return;
 	}
