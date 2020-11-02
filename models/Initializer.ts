@@ -25,13 +25,16 @@ export default class Initializer {
 	};
 
 	constructor(initializationMessage: Message) {
+		
 		this.message = initializationMessage;
-		if(!this.message.member.hasPermission("MANAGE_CHANNELS")){
-			throw new Error("User does not have permission to modify channels");
-		}
+		
 	}
 
 	public async initialize(profile?:Array<StreakGroup>): Promise<Initializer> {
+		const guildMember = await this.message.guild.fetchMember(this.message.author);
+		if(!guildMember.hasPermission("MANAGE_CHANNELS")){
+			throw new Error("User does not have permission to modify channels");
+		}
 		if(!profile) profile = await this.generateStreakGroup();
 		this.profile = profile;
 		await Promise.all(profile.map<Promise<void>>(g => this.initializeGroup(g)));

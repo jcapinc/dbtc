@@ -1,4 +1,4 @@
-import { User, Message, GuildMember } from "discord.js";
+import { User, Message } from "discord.js";
 import { FileManager } from "./Database";
 import Rank from "./Rank";
 

@@ -8,7 +8,7 @@ export default class Rank {
 	}
 
 	getUserRank(message: Message){
-		return this.getSortedStreaks().findIndex(streak => streak.memberid === message.member.id);
+		return this.getSortedStreaks().findIndex(streak => streak.memberid === message.author.id);
 	}
 
 	getSortedStreaks(){
@@ -25,7 +25,7 @@ export default class Rank {
 		const ps = this.getSortedStreaks().slice(start,end).map(async (streak, index) => {
 			const user = await message.client.fetchUser(streak.memberid);
 			const ret = `#${start + index + 1}: ${user.username}: ${Math.round(streak.streak / 60 / 60 / 24 / 1000)} days`
-			if(user.id === message.member.id) return `**${ret}**`;
+			if(user.id === message.author.id) return `**${ret}**`;
 			return ret;
 		});
 		return `Top Updated Streaks(${start+1} to ${end})\r\n` + (await Promise.all(ps)).join("\r\n");

@@ -20,17 +20,18 @@ export class Assigner{
 	}
 
 	public async assign(message: Message): Promise<Role> {
+		const guildMember = await message.guild.fetchMember(message.author);
 		if(!this.profile) await this.getProfile();
 		if(!this.streak)  await this.getStreak(message);
-		if(!this.streak) throw new Error(`!guide ${message.member.displayName} you have no streak on record`);
+		if(!this.streak) throw new Error(`!guide ${guildMember.displayName} you have no streak on record`);
 		let lastStreakInterval = 0;
 		const streaktime = (new Date()).getTime() - this.streak.getStartDate().getTime() + 1;
 		for(var sg of this.profile){
 			if(streaktime >= lastStreakInterval && streaktime <= sg.endInterval){
 				if(!message.guild.roles.get(sg.roleid)){
-					throw new Error(`${message.member.displayName} Something went wrong with server setup, im not able to assign you to your group`);
+					throw new Error(`${guildMember.displayName} Something went wrong with server setup, im not able to assign you to your group`);
 				}
-				await this.setRole(message.member, message.guild.roles.get(sg.roleid));
+				await this.setRole(guildMember, message.guild.roles.get(sg.roleid));
 				return message.guild.roles[sg.roleid];
 			}
 			lastStreakInterval = sg.endInterval;
@@ -52,7 +53,7 @@ export class Assigner{
 
 	private async getStreak(message: Message): Promise<void> {
 		const db = await this.getDB();
-		this.streak = db.streaks.find(s => s.memberid == message.member.id);
+		this.streak = db.streaks.find(s => s.memberid == message.author.id);
 	}
 
 	private async getDB(): Promise<Database> {
