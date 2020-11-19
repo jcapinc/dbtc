@@ -1,8 +1,7 @@
 import UserCommand from "../models/UserCommand";
-import { describe, it, before, after } from "mocha";
+import { describe, it } from "mocha";
 import { expect } from "chai";
-import * as sinon from "sinon";
-import { Message, Channel, Client, TextChannel, Guild } from "discord.js";
+import { Message, Client, TextChannel, Guild } from "discord.js";
 
 describe("The command system", () => {
 	it("executes commands based on regex",() => {
