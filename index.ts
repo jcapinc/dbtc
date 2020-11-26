@@ -317,6 +317,13 @@ function connect(token){
 	client.on('message', message => UserCommand.process(message));
 	client.login(process.env.TOKEN);
 }
-if (typeof process.env.TOKEN === "string" && process.env.TOKENS !== "string") {
+
+if (typeof process.env.TOKEN === "string" && typeof process.env.TOKENS !== "string") {
 	connect(process.env.TOKEN);
+}
+else if (typeof process.env.TOKENS === "string") {
+	process.env.TOKENS.split(",").map(connect);
+}
+else {
+	console.error("NO TOKENS DEFINED");
 }

@@ -80,9 +80,17 @@ export class FileManager {
 	public backup(): Promise<string>{
 		return new Promise((resolve,reject) => {
 			const date = new Date();
-			const datestring = [date.getFullYear(),date.getMonth(),date.getDate(),"-",date.getHours(),date.getMinutes(),date.getSeconds()].join("");
-			const filename = `db-backup-${datestring}.json`;
-			copyFile(this.filename,filename,err => {
+			const datestring = [ 
+				date.getFullYear(), 
+				date.getMonth(), 
+				date.getDate(),
+				"-",
+				date.getHours(),
+				date.getMinutes(),
+				date.getSeconds()
+			].join("");
+			const filename = `db-backup-${fs}-${datestring}.json`;
+			copyFile(this.filename, filename,err => {
 				if(err) reject(err);
 				resolve(filename)
 			})
