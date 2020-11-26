@@ -6,7 +6,7 @@ pipeline {
 				sh "npm install"
 			}
 		}
-		stage ('Boggert') {
+		stage ('Tests') {
 			steps {
 				sh "npm run test"
 			}

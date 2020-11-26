@@ -312,7 +312,11 @@ UserCommand.register(new UserCommand(/^\!admin\soldstreaks$/, async function(mes
 	}
 }))
 //#endregion
-
-client.on('ready', () => console.log(`Logged in as ${client.user.tag}`));
-client.on('message', message => UserCommand.process(message));
-client.login(process.env.TOKEN);
+function connect(token){
+	client.on('ready', () => console.log(`Logged in as ${client.user.tag}`));
+	client.on('message', message => UserCommand.process(message));
+	client.login(process.env.TOKEN);
+}
+if (typeof process.env.TOKEN === "string" && process.env.TOKENS !== "string") {
+	connect(process.env.TOKEN);
+}
