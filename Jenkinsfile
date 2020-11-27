@@ -1,6 +1,5 @@
 pipeline {
 	agent any
-	trig
 	stages {
 		stage ('Installing') {
 			steps {
