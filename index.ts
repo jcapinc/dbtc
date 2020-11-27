@@ -312,6 +312,8 @@ UserCommand.register(new UserCommand(/^\!admin\soldstreaks$/, async function(mes
 	}
 }))
 //#endregion
+
+// Inconsequential change
 function connect(token){
 	client.on('ready', () => console.log(`Logged in as ${client.user.tag}`));
 	client.on('message', message => UserCommand.process(message));
