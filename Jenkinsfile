@@ -21,16 +21,16 @@ pipeline {
 				sh 'npm run build'
 			}
 		}
-		stage ('Deliver') {
-			steps {
-				if (exists) {
+		if (exists) {
+			stage ('Deliver') {
+				steps {
 					sh 'cp -rv ${WORKSPACE}/build ${targetPath}/build'
 					sh 'cp -rv ${WORKSPACE}/node_modules ${targetPath}/node_modules'
 				}
-				else {
-					echo 'No target directory to build into, skipping'
-				}
 			}
+		}
+		else {
+			echo 'No target directory to build into, skipping'
 		}
 	}
 }
