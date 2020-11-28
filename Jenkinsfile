@@ -21,9 +21,7 @@ pipeline {
 		}
 		stage ('Deliver') {
 			steps {
-				sh 'printenv'
-
-//				sh 'cp -r  /home/jeffrey/dbtc_master'
+				sh 'cp -rv ${WORKSPACE}/build /home/jeffrey/dbtc_master/'
 			}
 		}
 	}
