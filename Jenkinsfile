@@ -21,7 +21,15 @@ pipeline {
 		}
 		stage ('Deliver') {
 			steps {
-				sh 'cp -rv ${WORKSPACE}/build /home/jeffrey/dbtc_master/'
+				def targetPath = "/home/jeffrey/dbtc_${BRANCH_NAME}"
+				def exists = fileExists targetPath
+				if (exists) {
+					sh 'cp -rv ${WORKSPACE}/build ${targetPath}/build'
+					sh 'cp -rv ${WORKSPACE}/node_modules ${targetPath}/node_modules'
+				}
+				else {
+					echo 'No target directory to build into, skipping'
+				}
 			}
 		}
 	}
