@@ -25,8 +25,8 @@ pipeline {
 				expression 	{ fileExists targetPath }
 			}
 			steps {
-				sh "rsync -rv ${WORKSPACE}/build ${targetPath}"
 				sh "rsync -rv ${WORKSPACE}/node_modules ${targetPath}"
+				sh "rsync -rv ${WORKSPACE}/build ${targetPath}"
 			}
 		}
 	}
