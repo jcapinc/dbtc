@@ -1,3 +1,5 @@
+def targetPath = "/home/jeffrey/dbtc_${BRANCH_NAME}"
+def exists = fileExists targetPath
 pipeline {
 	agent any
 	triggers {
@@ -20,8 +22,6 @@ pipeline {
 			}
 		}
 		stage ('Deliver') {
-			def targetPath = "/home/jeffrey/dbtc_${BRANCH_NAME}"
-			def exists = fileExists targetPath
 			steps {
 				if (exists) {
 					sh 'cp -rv ${WORKSPACE}/build ${targetPath}/build'
