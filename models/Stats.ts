@@ -88,7 +88,7 @@ export default class Stats{
 	}
 
 	getMemberCountMessage(): string {
-		return `${this.getMemberCount()} members are currently tracking streaks`;
+		return `${this.getMemberCount()} members are tracking streaks`;
 	}
 
 	getDurationStatMessage(): string {
