@@ -20,9 +20,9 @@ pipeline {
 			}
 		}
 		stage ('Deliver') {
+			def targetPath = "/home/jeffrey/dbtc_${BRANCH_NAME}"
+			def exists = fileExists targetPath
 			steps {
-				def targetPath = "/home/jeffrey/dbtc_${BRANCH_NAME}"
-				def exists = fileExists targetPath
 				if (exists) {
 					sh 'cp -rv ${WORKSPACE}/build ${targetPath}/build'
 					sh 'cp -rv ${WORKSPACE}/node_modules ${targetPath}/node_modules'
