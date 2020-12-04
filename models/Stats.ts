@@ -88,7 +88,7 @@ export default class Stats{
 	}
 
 	getMemberCountMessage(): string {
-		return `${this.getMemberCount()} members are currently tracking streaks`;
+		return `${this.getMemberCount()} members are tracking streaks`;
 	}
 
 	getDurationStatMessage(): string {
@@ -96,7 +96,8 @@ export default class Stats{
 	}
 
 	getMinMaxMessage(): string {
-		return `The shortest streak is ${this.getMinStreakHours()} hours and the longest streak is ${this.getMaxStreakDays()} days`;
+		// old shortest message: The shortest streak is ${this.getMinStreakHours()} hours and 
+		return `the longest streak is ${this.getMaxStreakDays()} days`;
 	}
 
 	getStatParagraph(): string {
