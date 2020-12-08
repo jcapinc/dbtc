@@ -15,18 +15,21 @@ Once the bot is created, click the "OAuth2" navigation above the "Bot" navigatio
 This new screen gives you the ability to add the bot to the server that you are administrator for. Choose your test server. It should be added to your server, but it should come across as offline.
 
 ### Once you have a bot account running
+
 On your discord application page, click "Bot" and in the center of the screen you should see the "Token" header with the "Copy" and "Regenerate" buttons underneath it. Click the "Copy" button to get the token onto your clipboard.
 
 With a cloned repository of "dbtc" downloaded, copy the `env-example` file into `.env` and fill in the `TOKEN` value with the contens of your clipboard. Do not put the contents of the clipboard into any kind of quotes.
 
-### Once you have the environment prereq's 
-With this available to the system you should be able to install the npm dependancies with `npm install` and then run `npm run start` to make the system build once and run the build. 
+### Once you have the environment prereq's
+
+With this available to the system you should be able to install the npm dependancies with `npm install` and then run `npm run start` to make the system build once and run the build.
 
 If you would like to actively develop with auto-refresh on save try `npm run develop`.
 
-
 ## Unit Tests
+
 At time of writing, unit tests are limited and not well-fleshed out, this is a great opportunity for development.
 
 # Project Overview
+
 The `index.ts` file defines all of the commands, with references to the models to do most of the heavy lifting for each command. The 'database' is just a flat json file, managed by the `models/Database.ts` file.
