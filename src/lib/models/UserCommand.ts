@@ -4,7 +4,7 @@ export interface iUserCommand {
 	matcher: RegExp;
 	outMethod: (output: string) => void;
 	shouldHandle(userInput: Message): boolean;
-	handle(userInput: Message): void;
+	handle(userInput: Message): Promise<unknown>;
 	setOutMethod(method: (output: string) => void): void;
 }
 
@@ -12,12 +12,12 @@ export default class UserCommand implements iUserCommand {
 	static commands: Array<iUserCommand> = [];
 	matcher: RegExp;
 	controlChar: string;
-	action: (command: Message) => void;
+	action: (command: Message) => Promise<unknown>;
 	outMethod: (output: string) => void;
 
 	constructor(
 		matcher: RegExp,
-		action: (this: UserCommand, message: Message) => void
+		action: (this: UserCommand, message: Message) => Promise<unknown>
 	) {
 		this.action = action;
 		this.matcher = matcher;
@@ -32,7 +32,7 @@ export default class UserCommand implements iUserCommand {
 		return this.matcher.test(userInput.content);
 	}
 
-	public handle(userInput: Message): void {
+	public handle(userInput: Message): Promise<unknown> {
 		return this.action.call(this, userInput);
 	}
 
@@ -44,15 +44,20 @@ export default class UserCommand implements iUserCommand {
 		this.commands.push(command);
 	}
 
+	public static clearCommands() {
+		this.commands = [];
+	}
+
 	public static getCommandByMatcher(matcher: RegExp): iUserCommand {
 		return this.commands.filter((cmd) => cmd.matcher === matcher)[0];
 	}
 
-	public static process(userInput: Message): void {
+	public static async process(userInput: Message): Promise<unknown> {
 		for (let command of this.commands) {
 			if (command.shouldHandle(userInput)) {
 				return command.handle(userInput);
 			}
 		}
+		return;
 	}
 }

@@ -27,10 +27,11 @@ export class Assigner {
 		const guildMember = await message.guild.fetchMember(message.author);
 		if (!this.profile) await this.getProfile();
 		if (!this.streak) await this.getStreak(message);
-		if (!this.streak)
+		if (!this.streak) {
 			throw new Error(
 				`!guide ${guildMember.displayName} you have no streak on record`
 			);
+		}
 		let lastStreakInterval = 0;
 		const streaktime =
 			new Date().getTime() - this.streak.getStartDate().getTime() + 1;
@@ -67,7 +68,9 @@ export class Assigner {
 
 	private async getStreak(message: Message): Promise<void> {
 		const db = await this.getDB();
-		this.streak = db.streaks.find((s) => s.memberid == message.author.id);
+		this.streak = db.streaks.find((s) => {
+			return s.memberid == message.author.id
+		});
 	}
 
 	private async getDB(): Promise<Database> {

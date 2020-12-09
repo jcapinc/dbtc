@@ -97,7 +97,7 @@ export class FileManager {
 				date.getMinutes(),
 				date.getSeconds(),
 			].join("");
-			const filename = `db-backup-${fs}-${datestring}.json`;
+			const filename = `db-backup-${datestring}.json`;
 			copyFile(this.filename, filename, (err) => {
 				if (err) reject(err);
 				resolve(filename);

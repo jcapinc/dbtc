@@ -29,7 +29,7 @@ export const CommandDictionary: Record<string, UserCommand> = {
 		const guildMember = await message.guild.fetchMember(message.author);
 		try {
 			const helptext = await new Promise((resolve, reject) => {
-				fs.readFile("./help.txt", (err, data) => {
+				fs.readFile("./static/help.txt", (err, data) => {
 					if (err) reject(err);
 					resolve(data.toString());
 				});
@@ -47,7 +47,6 @@ export const CommandDictionary: Record<string, UserCommand> = {
 	relapse: new UserCommand(/^\!relapse$/, async function (message) {
 		try {
 			if (await restricted(message)) return false;
-			console.log(Object.keys(message));
 			const streak = await Streak.relapse(message.author);
 			await Assigner.assign(message, streak);
 			message.channel.send(
@@ -106,17 +105,18 @@ export const CommandDictionary: Record<string, UserCommand> = {
 		try {
 			if (await restricted(message)) return false;
 			await Assigner.assign(message);
-			message.channel.send(await Streak.update(message.author));
+			return message.channel.send(await Streak.update(message.author));
 		} catch (err) {
 			let ex: Error = err;
 			message.channel.send(ex.message);
-			console.log(ex);
+			return console.log(ex);
 		}
 	}),
 
-	stat: new UserCommand(/^\!stats/, async function (message) {
+	stats: new UserCommand(/^\!stats/, async function (message) {
 		try {
-			message.channel.send(await Stats.getStats());
+			const stats = await Stats.getStats();
+			message.channel.send(stats);
 			return;
 		} catch (err) {
 			let ex: Error = err;

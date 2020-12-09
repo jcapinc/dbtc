@@ -16,7 +16,7 @@ export {
 export { Streak, deleteCode, deleteResponse } from "./models/Streak";
 export { connect, connectAll } from "./Connect";
 
-export { Commands } from "./Commands";
+export { Commands, CommandDictionary } from "./Commands";
 export {
 	Initializer,
 	StreakGroup,
