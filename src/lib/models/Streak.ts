@@ -128,7 +128,7 @@ export class Streak {
 		).join(", ");
 		return {
 			code: "DELETED",
-			message: `user(s) '${userList}' streak(s) was deleted`,
+			message: `user(s) '${userList}' streak(s) deleted`,
 		};
 	}
 

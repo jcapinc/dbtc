@@ -196,16 +196,17 @@ export const CommandDictionary: Record<string, UserCommand> = {
 			message.channel.send(
 				"Cannot find guild member to ascertain permissions, access denied"
 			);
+			return;
 		}
 		if (!guildMember.hasPermission("ADMINISTRATOR")) {
 			message.channel.send("this is an admin-only command");
 			return;
 		}
 		try {
-			message.channel.sendMessage("Received, initializing....");
+			message.channel.send("Received, initializing....");
 			const init = new Initializer(message);
 			await init.initialize();
-			message.channel.sendMessage("Channels should be created");
+			message.channel.send("Channels should be created");
 		} catch (err) {
 			let ex: Error = err;
 			message.channel.send(ex.message);
@@ -222,7 +223,7 @@ export const CommandDictionary: Record<string, UserCommand> = {
 		try {
 			message.channel.send(
 				await new Promise((resolve, reject) => {
-					fs.readFile("./adminhelp.txt", (err, data) => {
+					fs.readFile("./static/adminhelp.txt", (err, data) => {
 						if (err) reject(err);
 						resolve(data.toString());
 					});
@@ -249,7 +250,7 @@ export const CommandDictionary: Record<string, UserCommand> = {
 		}
 	),
 
-	adminUntrestict: new UserCommand(
+	adminUnrestrict: new UserCommand(
 		/^\!admin\sunrestrict/,
 		async function (message) {
 			const guildMember = await message.guild.fetchMember(message.author);

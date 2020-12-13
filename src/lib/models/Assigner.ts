@@ -69,7 +69,7 @@ export class Assigner {
 	private async getStreak(message: Message): Promise<void> {
 		const db = await this.getDB();
 		this.streak = db.streaks.find((s) => {
-			return s.memberid == message.author.id
+			return s.memberid == message.author.id;
 		});
 	}
 

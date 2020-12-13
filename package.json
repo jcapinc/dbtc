@@ -9,7 +9,7 @@
 		"run": "node build/index.js",
 		"start": "run-s build run",
 		"develop": "nodemon --inspect -e ts -w index.ts -w models --exec \"npm run start\"",
-		"test-inspect": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
+		"test-inspect": "node ./node_modules/jest/bin/jest.js --runInBand",
 		"prettier": "prettier --write ."
 	},
 	"author": "",
