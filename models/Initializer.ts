@@ -1,4 +1,4 @@
-import { Message, Role, RoleData, Channel, ChannelData, Guild } from "discord.js";
+import { Message, Role, RoleData, Channel, ChannelData, Guild, CategoryChannel, PermissionOverwrites, OverwriteData } from "discord.js";
 import { FileManager } from "./Database";
 
 export interface StreakGroupNames {
@@ -8,7 +8,7 @@ const day = 60 * 60 * 24 * 1000;
 export default class Initializer {
 	message: Message;
 	profile: Array<StreakGroup>;
-	categoryChannel: Channel;
+	categoryChannel: CategoryChannel;
 	streakGroupNames: StreakGroupNames = {
 		"1st Day":             day,
 		"2nd to 3rd Day":      day * 3,
@@ -31,7 +31,7 @@ export default class Initializer {
 	}
 
 	public async initialize(profile?:Array<StreakGroup>): Promise<Initializer> {
-		const guildMember = await this.message.guild.fetchMember(this.message.author);
+		const guildMember = await this.message.guild.member(this.message.author);
 		if(!guildMember.hasPermission("MANAGE_CHANNELS")){
 			throw new Error("User does not have permission to modify channels");
 		}
@@ -46,14 +46,14 @@ export default class Initializer {
 	}
 
 	public async initializeGroup(group:StreakGroup): Promise<void> {
-		return group.initialize(this.message.guild);
+		return group.initialize(this.message.guild, this.categoryChannel);
 	}
 
 	private async generateStreakGroup(): Promise<Array<StreakGroup>> {
-		this.categoryChannel = await this.message.guild.createChannel("Streaks",{type:"category"});
+		this.categoryChannel = await this.message.guild.channels.create("Streaks",{type:"category"});
 		return Object.keys(this.streakGroupNames).map(name => {
 			const grp = new StreakGroup(name);
-			grp.channel.parent = this.categoryChannel;
+			grp.channel.parentID = this.categoryChannel.id;
 			grp.endInterval = this.streakGroupNames[name];
 			return grp;
 		});
@@ -62,7 +62,7 @@ export default class Initializer {
 
 export class StreakGroup {
 	role: RoleData;
-	channel: ChannelData;
+	channel: Partial<ChannelData>;
 	generatedRole: Role;
 	generatedChannel: Channel;
 	roleid: string;
@@ -76,27 +76,31 @@ export class StreakGroup {
 		this.channel = {
 			name: name,
 			nsfw: false,
-			type:"text"
 		};
 	}
 
-	async initialize(guild: Guild): Promise<void> {
+	async initialize(guild: Guild, category: CategoryChannel): Promise<void> {
 		this.generatedRole = await this.initializeRole(guild);
-		this.generatedChannel = await this.initializeChannel(guild, this.generatedRole);
+		this.generatedChannel = await this.initializeChannel(guild, this.generatedRole, category);
 	}
 
 	async initializeRole(guild: Guild): Promise<Role> {
-		const role = await guild.createRole(this.role);
+		const role = await guild.roles.create({data: this.role, reason: "DBTC Initialization"});
 		this.roleid = role.id;
 		return role;
 	}
 
-	async initializeChannel(guild:Guild, role: Role): Promise<Channel> {
-		this.channel.permissionOverwrites = this.channel.permissionOverwrites || [
-			{id: guild.defaultRole, deny:  "VIEW_CHANNEL" },
-			{id: role,              allow: "VIEW_CHANNEL" }
+	async initializeChannel(guild:Guild, role: Role, parent: CategoryChannel): Promise<Channel> {
+		const permissionOverwrites: OverwriteData[] = [
+			{id: guild.roles.everyone, deny:  "VIEW_CHANNEL" },
+			{id: role.id, allow: "VIEW_CHANNEL" }
 		];
-		const channel =  await guild.createChannel(this.channel.name,this.channel);
+		const channel =  await guild.channels.create(this.channel.name, {
+			type: "text",
+			nsfw: false,
+			parent,
+			permissionOverwrites
+		});
 		return channel;
 	}
 

@@ -12,7 +12,7 @@ export default class Restrict{
 		const db = await manager.load();
 		if(db.settings.restrictedChannel === undefined) return false;
 		if(db.settings.restrictedChannel !== message.channel.id){
-			return message.guild.channels.get(db.settings.restrictedChannel).name;
+			return message.guild.channels.resolve(db.settings.restrictedChannel).name;
 		};
 		return false;
 	}

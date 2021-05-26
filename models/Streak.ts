@@ -93,10 +93,12 @@ export class Streak{
 				if(!sorted[parseInt(ids[i]) - 1]){
 					continue;
 				} else {
-					const member = await message.client.fetchUser(sorted[parseInt(ids[i]) - 1].memberid);
+					const member = await message.guild.member(sorted[parseInt(ids[i]) - 1].memberid).user;
 					return {
 						code: "IDENTIFIED",
-						message: `user identified by rank ${ids[i]}. \nType \`!admin delete ${sorted[parseInt(ids[i]) - 1].memberid}\` to delete the streak of the user named ${member.username}`
+						message: `user identified by rank ${ids[i]}. \nType ` + 
+							`\`!admin delete ${sorted[parseInt(ids[i]) - 1].memberid}\`` +
+							` to delete the streak of the user named ${member.username}`
 					}
 				}
 			}
@@ -104,9 +106,9 @@ export class Streak{
 		}
 		manager.save(db);
 
-		const userList = (await Promise.all(streaks.map(async (streak) => {
-			return (await message.client.fetchUser(streak.memberid)).username;
-		}))).join(", ")
+		const userList = streaks.map(async (streak) => {
+			return message.guild.member(streak.memberid).user.username;
+		}).join(", ");
 		return {
 			code: "DELETED",
 			message: `user(s) '${userList}' streak(s) was deleted`
@@ -118,7 +120,7 @@ export class Streak{
 		const db = await manager.load();
 		const streaks = db.streaks.map(streak => Object.assign({}, streak, {
 			age: (new Date()).getTime() - streak.streak - streak.getStartDate().getTime(),
-			name: (message.guild.members.get(streak.memberid) || {displayName: "*missing user*"}).displayName
+			name: (message.guild.member(streak.memberid) || {displayName: "*missing user*"}).displayName
 		})).sort((a,b) => {
 			if(a.age === b.age) return 0;
 			if(a.age < b.age) return 1;
@@ -132,4 +134,4 @@ export class Streak{
 			return `${streak.name}${nameBuffer}${age}${ageBuffer}${streak.memberid}`
 		}).join("\n") + '```';
 	}
-}
+}	

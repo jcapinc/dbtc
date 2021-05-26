@@ -23,7 +23,7 @@ export default class Rank {
 		if( end < start ) [start, end] = [end, start];
 		if(end - start > 50) end = start + 50; 
 		const ps = this.getSortedStreaks().slice(start,end).map(async (streak, index) => {
-			const user = await message.client.fetchUser(streak.memberid);
+			const user = await message.guild.member(streak.memberid).user;
 			const ret = `#${start + index + 1}: ${user.username}: ${Math.round(streak.streak / 60 / 60 / 24 / 1000)} days`
 			if(user.id === message.author.id) return `**${ret}**`;
 			return ret;

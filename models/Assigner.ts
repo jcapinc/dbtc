@@ -20,18 +20,19 @@ export class Assigner{
 	}
 
 	public async assign(message: Message): Promise<Role> {
-		const guildMember = await message.guild.fetchMember(message.author);
+		const guildMember = await message.guild.member(message.author);
 		if(!this.profile) await this.getProfile();
 		if(!this.streak)  await this.getStreak(message);
 		if(!this.streak) throw new Error(`!guide ${guildMember.displayName} you have no streak on record`);
 		let lastStreakInterval = 0;
 		const streaktime = (new Date()).getTime() - this.streak.getStartDate().getTime() + 1;
 		for(var sg of this.profile){
-			if(streaktime >= lastStreakInterval && streaktime <= sg.endInterval){
-				if(!message.guild.roles.get(sg.roleid)){
+			const role = await message.guild.roles.fetch(sg.roleid);
+			if (streaktime >= lastStreakInterval && streaktime <= sg.endInterval){
+				if (!role) {
 					throw new Error(`${guildMember.displayName} Something went wrong with server setup, im not able to assign you to your group`);
 				}
-				this.setRole(guildMember, message.guild.roles.get(sg.roleid));
+				this.setRole(guildMember, await message.guild.roles.fetch(sg.roleid));
 				return message.guild.roles[sg.roleid];
 			}
 			lastStreakInterval = sg.endInterval;
@@ -40,10 +41,14 @@ export class Assigner{
 	}
 
 	public async setRole(member: GuildMember, role: Role): Promise<void> {
-		if(member.roles.has(role.id)) return;
+		if(member.roles.cache.has(role.id)) return;
 		try {
-			await member.removeRoles(this.profile.map(sg => sg.roleid));
-			await member.addRole(role.id);
+			for(const profile of this.profile) {
+				if (member.roles.cache.has(profile.roleid)) 
+				
+				await member.roles.remove(profile.roleid, `Streak update, removing ${profile.roleid} to add ${role.id}`);
+			}
+			await member.roles.add(role.id);
 		} catch(e) {
 			return;
 		}
