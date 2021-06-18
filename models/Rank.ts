@@ -1,5 +1,5 @@
 import { Database, FileManager } from "./Database";
-import { Message } from "discord.js";
+import { Client, Message } from "discord.js";
 
 export default class Rank {
 	db: Database;
@@ -19,11 +19,11 @@ export default class Rank {
 		})
 	}
 
-	async getRank(message: Message, start: number, end: number){
+	async getRank(message: Message, start: number, end: number, client: Client){
 		if( end < start ) [start, end] = [end, start];
 		if(end - start > 50) end = start + 50; 
 		const ps = this.getSortedStreaks().slice(start,end).map(async (streak, index) => {
-			const user = await message.guild.member(streak.memberid).user;
+			const user = await client.users.fetch(streak.memberid);
 			const ret = `#${start + index + 1}: ${user.username}: ${Math.round(streak.streak / 60 / 60 / 24 / 1000)} days`
 			if(user.id === message.author.id) return `**${ret}**`;
 			return ret;
@@ -31,18 +31,18 @@ export default class Rank {
 		return `Top Updated Streaks(${start+1} to ${end})\r\n` + (await Promise.all(ps)).join("\r\n");
 	}
 
-	static async getMemberRank(message: Message){
+	static async getMemberRank(message: Message, client: Client){
 		const fm = new FileManager();
 		const r = new Rank(await fm.load());
 		const index = r.getUserRank(message);
-		return await r.getRank(message, Math.max(0, index - 5), index + 5);
+		return await r.getRank(message, Math.max(0, index - 5), index + 5, client);
 	}
 
-	static async getRank(message: Message, start: number = 0, end: number = 9){
+	static async getRank(message: Message, start: number = 0, end: number = 9, client: Client){
 		const fm = new FileManager();
 		const db = await fm.load();
 		const r = new Rank(db);
-		return await r.getRank(message, start, end);
+		return await r.getRank(message, start, end, client);
 	}
 
 }

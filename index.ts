@@ -131,7 +131,7 @@ UserCommand.register(new UserCommand(/^\!groupstats/, async function(message){
 
 UserCommand.register(new UserCommand(/^\!rank\s?$/, async function(message){
 	try{
-		message.channel.send(await Rank.getRank(message) + "\r\n\r\nTry `!rank 10-20` or `!myrank` for more information");
+		message.channel.send(await Rank.getRank(message, 0, 9, client) + "\r\n\r\nTry `!rank 10-20` or `!myrank` for more information");
 		return;
 	} catch(err){
 		let ex: Error = err;
@@ -145,7 +145,7 @@ UserCommand.register(new UserCommand(/^\!rank\s([0-9]+)\-([0-9]+)\s?$/, async fu
 		const match = this.matcher.exec(message.content);
 		const start = parseInt(match[1]) || 1;
 		const end = parseInt(match[2]) || 10;
-		message.channel.send(await Rank.getRank(message, start - 1, end - 1));
+		message.channel.send(await Rank.getRank(message, start - 1, end - 1, client));
 	} catch(err){
 		let ex: Error = err;
 		message.channel.send(ex.message);
@@ -155,7 +155,7 @@ UserCommand.register(new UserCommand(/^\!rank\s([0-9]+)\-([0-9]+)\s?$/, async fu
 
 UserCommand.register(new UserCommand(/^\!myrank/, async function(message){
 	try{
-		return message.channel.send(await Rank.getMemberRank(message));
+		return message.channel.send(await Rank.getMemberRank(message, client));
 	} catch(err){
 		let ex: Error = err;
 		message.channel.send(ex.message);
